@@ -1,0 +1,127 @@
+git config --global user.name "maxv33f1x5"
+git config --global user.email "max01.f1x4@gmail.com"
+git config --list
+mkdir a1
+cd a1
+git init
+touch hi.txt
+nano hi.txt
+git add .
+git commit -m "initial commit"
+git remote add origin https://github.com/maxv33f1x5/a1.git
+git status
+git push -u origin master
+git log
+git clone https://github.com/maxv33f1x5/coursera.git
+git reset --hard
+
+
+
+
+
+
+
+
+
+
+
+sudo apt update
+git config --global user.name "maxv33f1x5"
+git config --global user.email "max01.f1x4@gmail.com"
+git config --list
+
+mkdir git-merge
+cd git-merge
+git init
+
+echo "version1" > file.txt
+git add .
+git commit -m "initial commit"
+
+git checkout -b feature
+echo "feature_version" > file1.txt
+git add .
+git commit -m "changed in feature"
+
+git checkout master
+echo "main version" > file1.txt
+git add .
+
+git merge feature
+
+cat file1.txt
+
+echo "allow main and feature branch" > file1.txt
+git add .
+git commit -m "resolved merge conflict"
+
+git log
+
+cat file1.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sudo apt update
+git config --global user.name "maxv33f1x5"
+git config --global user.email "max01.f1x4@gmail.com"
+
+sudo apt install openjdk-21-jdk -y
+sudo rm jenkins.war
+sudo rm -rf ~/.jenkins
+wget https://get.jenkins.io/war-stable/latest/jenkins.war
+java -jar jenkins.war --httpPort=8080
+#############sign-in to Jenkins, create pipeline
+
+sudo apt install snapd
+sudo snap install ngrok
+##########################ngrok add token from ngrok website
+ngrok http 8080
+##########copy url, add webhook, /github-webhook/, content type json
+
+
+
+
+script.sh
+
+echo "hello world!"
+echo "Jenkins runed successfully!"
+
+
+
+Jenkinsfile
+
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Clone') {
+            steps {
+                git url: "https://github.com/username/repository.git", branch: "main"
+            }
+        }
+
+        stage('Run Script') {
+            steps {
+                sh 'chmod +x script.sh'
+                sh './script.sh'
+            }
+        }
+
+    }
+}
