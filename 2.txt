@@ -1,0 +1,42 @@
+git config --global user.name "usernameislol12"
+git config --global user.email "usernameislol25@gmail.com"
+git config --list
+mkdir hello
+cd hello
+git init
+git clone https://github.com/usernameislol12/program2.git
+cd program2
+nano hi.txt
+git add hi.txt
+git commit -m "initial commit"
+git branch
+git push origin main
+git branch feature-branch
+git checkout feature-branch
+nano hihello.txt
+git add hihello.txt
+git commit -m "initial commit"
+git branch
+git push origin feature-branch
+
+
+mkdir merge-conflict
+cd merge-conflict
+git init
+echo "version1">file1.txt
+git add .
+git commit -m "inital commit"
+git checkout -b feature
+echo "feature version">file1.txt
+git commit -am "feature commit"
+git checkout master
+echo "master version">file1.txt
+git commit -am "master commit"
+git merge feature
+cat file1.txt
+echo "hello world">file1.txt
+git add .
+git merge feature
+git commit -m "conflict solved"
+git merge feature
+git log
