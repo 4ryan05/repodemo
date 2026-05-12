@@ -1,0 +1,208 @@
+sudo apt update
+docker --version
+mkdir my-python-app
+cd my-python-app
+
+
+nano app.py
+
+#app.py
+from flask import Flask
+app = Flask(__name__)
+@app.route("/")
+def home():
+return "Hello! Docker is running this Python app successfully "
+if __name__ == "__main__":
+app.run(host="0.0.0.0", port=5000)
+
+nano Dockerfile
+
+#Dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app.py .
+EXPOSE 5000
+CMD ["python", "app.py"]
+
+nano requirements.txt
+
+flask
+
+git init
+git config --global user.name
+git config --global user.email
+git add . 
+git commit -m "initial commit"
+git remote add origin https://
+git push origin master
+
+in git repo, create Jenkinsfile
+
+#Jenkinsfile
+pipeline {
+agent any
+environment {
+DOCKER_IMAGE = "ankith05/my-python-app1"  //dockerusername/my-python-app
+DOCKER_TAG = "latest"
+}
+stages {
+stage('Build Docker Image') {
+steps {
+sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+}
+}
+stage('Login to DockerHub') {
+steps {
+withCredentials([usernamePassword(
+credentialsId: 'dockerhub-credentials',
+usernameVariable: 'USER',
+passwordVariable: 'PASS'
+)]) {
+sh 'echo $PASS | docker login -u $USER --password-stdin'
+}
+}
+}
+stage('Push Image') {
+steps {
+sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
+}
+}
+stage('Deploy Container') {
+steps {
+sh '''
+docker stop myapp-container || true
+docker rm myapp-container || true
+docker run -d -p 5001:5000 --name myapp-container $DOCKER_IMAGE:$DOCKER_TAG
+'''
+}
+}
+}
+}
+
+
+sudo docker build -t my-python-app .
+
+docker login -u 4kanksh
+docker tag my-python-app:latest 4kanksh/my-python-app:latest
+docker run -d -p 5000:5000 --name container 4kanksh/my-python-app:latest
+docker push 4kanksh/my-python-app:latest
+
+
+
+
+
+
+
+
+3. Add Docker Hub Credentials
+
+Since the pipeline needs to push images to Docker Hub, you must store your token securely.
+
+    From the Jenkins Dashboard, go to Manage Jenkins -> Credentials.
+
+    Click on (global) under the Domains column.
+
+    Click Add Credentials (top right).
+
+    Kind: Username with password.
+
+    Username: 4kanksh
+
+    Password: [Paste your Docker Hub Personal Access Token].
+
+    ID: dockerhub-credentials (This must match the name in the Jenkinsfile provided earlier).
+
+    Click Create.
+
+4. Create the Pipeline Job
+
+    Click New Item on the dashboard.
+
+    Enter name: docker-python-pipeline.
+
+    Select Pipeline and click OK.
+
+    Scroll down to the Pipeline section.
+
+    Definition: Pipeline script.
+
+    Paste the following optimized code into the script box:
+
+Groovy
+
+pipeline {
+    agent any
+    environment {
+        DOCKER_IMAGE = '4kanksh/my-python-app'
+    }
+    stages {
+        stage('Clone') {
+            steps {
+                git branch: 'master', url: 'https://github.com/4kanksh/lab5-pp.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "docker build -t $DOCKER_IMAGE:latest ."
+            }
+        }
+        stage('Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh "echo $PASS | docker login -u $USER --password-stdin"
+                    sh "docker push $DOCKER_IMAGE:latest"
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'docker stop myapp-container || true'
+                sh 'docker rm myapp-container || true'
+                sh "docker run -d -p 5000:5000 --name myapp-container $DOCKER_IMAGE:latest"
+            }
+        }
+    }
+}
+
+5. Run the Build
+
+    Click Save.
+
+    Click Build Now on the left menu.
+
+    Monitor the Stage View to see each step turn green.
+
+
+
+
+
+
+
+1. The Port Conflict Error
+
+In your manual steps, you run:
+docker run -d -p 5000:5000 --name container ...
+
+In your Jenkins Pipeline, you also run:
+sh "docker run -d -p 5000:5000 --name myapp-container ..."
+
+The Error: Jenkins will fail during the Deploy stage because Port 5000 is already being used by your manual container.
+
+The Fix: Before running the Jenkins build, stop and remove any existing containers using that port:
+Bash
+
+sudo docker stop container
+sudo docker rm container
+
+2. Docker Socket Permission Error
+
+Even though you are running Jenkins as your user, the Jenkins process often lacks direct permission to talk to the Docker engine.
+
+The Error: docker: permission denied or cannot connect to the Docker daemon.
+
+The Fix: Run this command in your terminal once:
+Bash
+
+sudo chmod 666 /var/run/docker.sock
