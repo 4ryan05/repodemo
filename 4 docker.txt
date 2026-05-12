@@ -1,0 +1,39 @@
+# STEP 1: Update the package list to ensure all installations are current
+sudo apt update
+
+# STEP 2: Install Docker if it is not already on your system
+sudo apt install docker.io -y
+
+# STEP 3: Start the Docker service and enable it to run on boot
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# STEP 4: Create a dedicated directory for the project [cite: 462]
+mkdir my-docker-app
+cd my-docker-app
+
+# STEP 5: Create the Java application file using nano 
+# Inside nano, paste the following Java code, then press Ctrl+O, Enter, and Ctrl+X:
+public class sample {
+    public static void main(String args[]){
+        System.out.println("Test");
+    }
+}
+nano sample.java
+
+# STEP 6: Create the Dockerfile configuration 
+# Inside nano, paste the following instructions, then press Ctrl+O, Enter, and Ctrl+X:
+FROM eclipse-temurin:21
+WORKDIR /app
+COPY . /app
+RUN javac sample.java
+CMD ["java", "sample"]
+nano Dockerfile
+
+# STEP 7: Build the Docker image for the application [cite: 556, 562]
+# This compiles the source and packages it into an image named 'program4'
+sudo docker build -t program4 .
+
+# STEP 8: Run the application using the Docker image [cite: 564, 570]
+# This creates a container named 'javaappli' and executes the code
+sudo docker run --name javaappli program4
